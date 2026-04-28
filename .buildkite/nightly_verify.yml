@@ -91,8 +91,9 @@ steps:
        - bash .buildkite/scripts/commit_verified_commit_hashes.sh
 
    - label: "Upload pytest duration artifact"
+     <<: *run-on-nightly-or-tag
      if: build.env("NIGHTLY") == "1"     
-     key: unit_test_duration
+     key: update_unit_test_duration_file
      artifact_paths: /mnt/disks/persist/models/.test_durations
      agents:
        queue: ${TPU_QUEUE_SINGLE:-tpu_v6e_queue}
