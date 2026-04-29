@@ -56,6 +56,7 @@ steps:
   
    - label: "Commit support matrices if is nightly build or release tag specified"
      <<: *run-on-nightly-or-tag
+     if: build.branch == "main"
      key: commit_support_matrices
      depends_on:
        - "v6_generate_matrices"
@@ -77,7 +78,7 @@ steps:
        - bash .buildkite/scripts/notify_test_results.sh
 
    - label: "Record verified commit hashes"
-     if: build.env("NIGHTLY") == "1"
+     if: build.branch == "main" && build.env("NIGHTLY") == "1"
      key: record_verified_commit_hashes
      depends_on:
        - notify_test_results
@@ -91,8 +92,7 @@ steps:
        - bash .buildkite/scripts/commit_verified_commit_hashes.sh
 
    - label: "Upload pytest duration artifact"
-     <<: *run-on-nightly-or-tag
-     if: build.env("NIGHTLY") == "1"     
+     if: build.branch == "main" && build.env("NIGHTLY") == "1"     
      key: update_unit_test_duration_file
      artifact_paths: /mnt/disks/persist/models/.test_durations
      agents:
