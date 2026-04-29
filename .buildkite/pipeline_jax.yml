@@ -123,7 +123,7 @@ steps:
         agents:
           queue: ${TPU_QUEUE_SINGLE:-tpu_v6e_queue}
         commands:
-          - rm -f .coverage.part{{matrix.group_index}}.${TPU_VERSION:-tpu6e}
+          - rm -f .coverage.part{{matrix}}.${TPU_VERSION:-tpu6e}
           - |
             .buildkite/scripts/run_in_docker.sh bash -c "python3 -m pytest -s -v -x --splits 4 --durations-path .buildkite/.test_durations --group {{matrix}} --cov-config=/workspace/tpu_inference/.coveragerc --cov tpu_inference tests/ --ignore=/workspace/tpu_inference/tests/kernels --ignore=/workspace/tpu_inference/tests/lora --ignore=/workspace/tpu_inference/tests/e2e --ignore=/workspace/tpu_inference/tpu_inference/mock --ignore=/workspace/tpu_inference/tests/models/jax/test_deepseek_v3.py; if [ -f .coverage ]; then cp .coverage /tmp/hf_home/.coverage.part{{matrix}}.${TPU_VERSION:-tpu6e}; else exit 1; fi"
           - cp /mnt/disks/persist/models/.coverage.part{{matrix}}.${TPU_VERSION:-tpu6e} ./
