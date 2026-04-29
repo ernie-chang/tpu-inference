@@ -17,6 +17,7 @@ set -e
 
 # --- Configuration ---
 REPO_URL="https://github.com/vllm-project/tpu-inference.git"
+# commit the duration files only run on main branch
 TARGET_BRANCH="main"
 
 COMMIT_MESSAGE="Update .test_durations file for unit test"
