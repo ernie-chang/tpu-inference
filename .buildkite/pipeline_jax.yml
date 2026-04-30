@@ -249,6 +249,30 @@ steps:
               exit 0
             fi
 
+      - label: "${TPU_VERSION:-tpu6e} E2E MMLU for DeepSeek-R1 torchax backend"
+        key: ${TPU_VERSION:-tpu6e}_test_14
+        depends_on: "${TPU_VERSION:-tpu6e}_build_docker"
+        soft_fail: true
+        env:
+          USE_PREBUILT_IMAGE: "1"
+          NEW_MODEL_DESIGN: "1"
+          SKIP_ACCURACY_TESTS: "False"
+          VLLM_MLA_DISABLE: "0"
+          MOE_REQUANTIZE_BLOCK_SIZE: "512"
+          MOE_REQUANTIZE_WEIGHT_DTYPE: "fp4"
+          MODEL_IMPL_TYPE: "vllm"
+          TPU_VERSION: "${TPU_VERSION:-tpu6e}"
+        agents:
+          queue: ${TPU_QUEUE_MULTI:-tpu_v6e_8_queue}
+        commands:
+          - |
+            if [[ "$TPU_VERSION" == "tpu7x" ]]; then
+              .buildkite/scripts/run_in_docker.sh bash /workspace/tpu_inference/tests/e2e/benchmarking/mmlu.sh -m  "gs://tpu-commons-ci/deepseek/r1" -n 14042 -l 4
+            else
+              echo "Skipping: Step requires TPU v7x."
+              exit 0
+            fi
+
       - label: "${TPU_VERSION:-tpu6e} lora e2e tests for JAX + vLLM models multi chips"
         key: ${TPU_VERSION:-tpu6e}_test_13
         depends_on: "${TPU_VERSION:-tpu6e}_build_docker"
@@ -608,9 +632,6 @@ steps:
           - ${TPU_VERSION:-tpu6e}_test_4
           - ${TPU_VERSION:-tpu6e}_test_6
           - ${TPU_VERSION:-tpu6e}_test_7
-          # - ${TPU_VERSION:-tpu6e}_test_7_2
-          # - ${TPU_VERSION:-tpu6e}_test_7_3
-          # - ${TPU_VERSION:-tpu6e}_test_7_4
           - ${TPU_VERSION:-tpu6e}_test_7_report
           - ${TPU_VERSION:-tpu6e}_test_8
           - ${TPU_VERSION:-tpu6e}_test_9
@@ -618,6 +639,7 @@ steps:
           - ${TPU_VERSION:-tpu6e}_test_11
           - ${TPU_VERSION:-tpu6e}_test_12
           - ${TPU_VERSION:-tpu6e}_test_13
+          - ${TPU_VERSION:-tpu6e}_test_14
           - ${TPU_VERSION:-tpu6e}_test_15
           - ${TPU_VERSION:-tpu6e}_test_16
           - ${TPU_VERSION:-tpu6e}_test_17
